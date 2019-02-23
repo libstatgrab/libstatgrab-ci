@@ -20,26 +20,64 @@
 # https://gitlab.com/gitlab-org/gitlab-runner/blob/2979aa0623d58e5af746b6d69b49bbb3613b8443/network/gitlab.go#L486
 # https://gitlab.com/gitlab-org/gitlab-runner/blob/2979aa0623d58e5af746b6d69b49bbb3613b8443/network/gitlab.go#L433
 
-if [ X"${1}" = X"artifacts-downloader" ]; then
+CMD=$1
+shift
+while (( "$#" )); do
+	case "$1" in
+		--url)
+			URL="$2"
+			shift 2
+			;;
+		--token)
+			TOKEN="$2"
+			shift 2
+			;;
+		--id)
+			ID="$2"
+			shift 2
+			;;
+		--path)
+			ARTIFACTPATHS="$ARTIFACTPATHS $2"
+			shift 2
+			;;
+		--expire-in)
+			EXPIREIN=`echo $2 | tr " " "+"`
+			shift 2
+			;;
+		--artifact-format)
+			ARTIFACTFORMAT="$2"
+			shift 2
+			;;
+		--artifact-type)
+			ARTIFACTTYPE="$2"
+			shift 2
+			;;
+		*)
+			shift # just ignore unknown flags
+			;;
+	esac
+done
+
+if [ X"${CMD}" = X"artifacts-downloader" ]; then
 	curl \
 		--silent --location \
 		--cacert "${CI_SERVER_TLS_CA_FILE}" \
-		--header "JOB-TOKEN: ${5}" \
-		"${3}api/v4/jobs/${7}/artifacts" > artifacts.zip
+		--header "JOB-TOKEN: ${TOKEN}" \
+		--output artifacts.zip \
+		"${URL}api/v4/jobs/${ID}/artifacts"
 	unzip -o -q artifacts.zip
 	rm -f artifacts.zip
 fi
 
-if [ X"${1}" = X"artifacts-uploader" ]; then
+if [ X"${CMD}" = X"artifacts-uploader" ]; then
 	rm -f artifacts.zip
-	zip -qr artifacts.zip ${9}
-	E=`echo ${11} | tr " " "+"` export E
+	zip -qr artifacts.zip ${ARTIFACTPATHS}
 	curl \
 		--silent --location \
 		--cacert "${CI_SERVER_TLS_CA_FILE}" \
-		--header "JOB-TOKEN: ${5}" \
+		--header "JOB-TOKEN: ${TOKEN}" \
 		-F "file=@artifacts.zip" \
-		"${3}api/v4/jobs/${7}/artifacts?artifact_format=${13}&artifact_type=${15}&expire_in=${E}" >/dev/null
+		"${URL}api/v4/jobs/${ID}/artifacts?artifact_format=${ARTIFACTFORMAT}&artifact_type=${ARTIFACTTYPE}&expire_in=${EXPIREIN}" >/dev/null
 	rm -f artifacts.zip
 fi
 
