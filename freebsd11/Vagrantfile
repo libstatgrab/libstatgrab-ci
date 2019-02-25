@@ -1,0 +1,17 @@
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "freebsd11"
+  config.vm.box = "bento/freebsd-11"
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "freebsd11"
+  end
+  config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+    pkg upgrade -y
+    pkg install -y curl zip git bash
+    mv /tmp/gitlab-runner /usr/bin/gitlab-runner
+    chown 0:0 /usr/bin/gitlab-runner
+    chmod 755 /usr/bin/gitlab-runner
+    shutdown -p now
+  SHELL
+end

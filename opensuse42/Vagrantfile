@@ -1,0 +1,18 @@
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "opensuse42"
+  config.vm.box = "bento/opensuse-leap-42"
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "opensuse42"
+  end
+  config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
+  config.vm.provision "shell", inline: <<-SHELL
+    sed -i '1s/^/PasswordAuthentication yes\\n/' /etc/ssh/sshd_config
+    zypper refresh
+    zypper update -y
+    zypper install -y zip unzip curl ncurses-devel git gcc make
+    mv /tmp/gitlab-runner /usr/bin/gitlab-runner
+    chown 0:0 /usr/bin/gitlab-runner
+    chmod 755 /usr/bin/gitlab-runner
+    shutdown -h -P now
+  SHELL
+end

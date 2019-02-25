@@ -1,0 +1,17 @@
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "arch"
+  config.vm.box = "generic/arch"
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "arch"
+  end
+  config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+    pacman --noconfirm -Syu
+    pacman --noconfirm -S zip unzip git gcc make
+    mv /tmp/gitlab-runner /usr/bin/gitlab-runner
+    chown 0:0 /usr/bin/gitlab-runner
+    chmod 755 /usr/bin/gitlab-runner
+    shutdown -h -P now
+  SHELL
+end

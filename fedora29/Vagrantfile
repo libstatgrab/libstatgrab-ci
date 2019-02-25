@@ -1,0 +1,18 @@
+Vagrant.configure("2") do |config|
+  # Seems to break this Fedora image?
+  #config.vm.hostname = "fedora29"
+  config.vm.box = "bento/fedora-29"
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "fedora29"
+  end
+  config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+    dnf update -y
+    dnf install -y git zip unzip curl gcc make ncurses-devel perl-Test-Simple perl-IPC-Cmd perl-Test-Harness
+    mv /tmp/gitlab-runner /usr/bin/gitlab-runner
+    chown 0:0 /usr/bin/gitlab-runner
+    chmod 755 /usr/bin/gitlab-runner
+    shutdown -h -P now
+  SHELL
+end
