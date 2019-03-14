@@ -2,3 +2,5 @@
 lsgci
 lsgci.pub
 secrets.sh
+solaris11x86/pkg.oracle.com.certificate.pem
+solaris11x86/pkg.oracle.com.key.pem

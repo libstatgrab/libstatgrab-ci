@@ -23,6 +23,7 @@ $boxes = [
   'openbsd6',
   'opensuse42',
   'oracle7',
+  'solaris11x86',
   'ubuntu1604',
   'ubuntu1604i386',
   'ubuntu1804',

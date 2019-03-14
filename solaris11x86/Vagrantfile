@@ -1,0 +1,32 @@
+# These two files are downloaded from https://pkg-register.oracle.com/
+# 
+# pkg.oracle.com.certificate.pem
+# pkg.oracle.com.key.pem
+# 
+# The password hash below is simply "vagrant"
+
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "solaris11x86"
+  config.vm.box = "MartijnDwars/solaris11_4"
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "solaris11x86"
+  end
+  config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
+  config.vm.provision "file", source: "pkg.oracle.com.certificate.pem", destination: "/tmp/pkg.oracle.com.certificate.pem"
+  config.vm.provision "file", source: "pkg.oracle.com.key.pem", destination: "/tmp/pkg.oracle.com.key.pem"
+  config.vm.provision "shell", inline: <<-SHELL
+    mv /tmp/pkg.oracle.com.certificate.pem /var/pkg/ssl
+    mv /tmp/pkg.oracle.com.key.pem /var/pkg/ssl
+    chown 0:0 /var/pkg/ssl/pkg.oracle.com.certificate.pem /var/pkg/ssl/pkg.oracle.com.key.pem
+    chmod 400 /var/pkg/ssl/pkg.oracle.com.certificate.pem /var/pkg/ssl/pkg.oracle.com.key.pem
+    pkg update -v --accept
+    pkg install -v --accept gcc-c-7 git sunpro-incorporation developer-studio-utilities
+    pkg set-publisher -k /var/pkg/ssl/pkg.oracle.com.key.pem -c /var/pkg/ssl/pkg.oracle.com.certificate.pem -G '*' -g https://pkg.oracle.com/solarisstudio/release solarisstudio
+    pkg install -v --accept developerstudio-126/cc
+    mv /tmp/gitlab-runner /usr/bin/gitlab-runner
+    chown 0:0 /usr/bin/gitlab-runner
+    chmod 755 /usr/bin/gitlab-runner
+    passwd -p '$5$rounds=10000$OQ8tzBHg$cmXTpNJeASVYhpsME14HxTWIO2msj.2wOlFGEnrfkN2' vagrant
+    shutdown -y -i 5
+  SHELL
+end
