@@ -27,6 +27,8 @@ Vagrant.configure("2") do |config|
     chown 0:0 /usr/bin/gitlab-runner
     chmod 755 /usr/bin/gitlab-runner
     passwd -p '$5$rounds=10000$OQ8tzBHg$cmXTpNJeASVYhpsME14HxTWIO2msj.2wOlFGEnrfkN2' vagrant
+    cp -Rp /export/home/vagrant /vagrant-home
+    usermod -d /vagrant-home vagrant
     shutdown -y -i 5
   SHELL
 end
