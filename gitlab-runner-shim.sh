@@ -61,6 +61,7 @@ done
 if [ X"${CMD}" = X"artifacts-downloader" ]; then
 	curl \
 		--silent --location \
+		--retry 10 --retry-connrefused \
 		--cacert "${CI_SERVER_TLS_CA_FILE}" \
 		--header "JOB-TOKEN: ${TOKEN}" \
 		--output artifacts.zip \
@@ -74,6 +75,7 @@ if [ X"${CMD}" = X"artifacts-uploader" ]; then
 	zip -qr artifacts.zip ${ARTIFACTPATHS}
 	curl \
 		--silent --location \
+		--retry 10 --retry-connrefused \
 		--cacert "${CI_SERVER_TLS_CA_FILE}" \
 		--header "JOB-TOKEN: ${TOKEN}" \
 		-F "file=@artifacts.zip" \
