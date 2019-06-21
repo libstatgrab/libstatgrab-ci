@@ -1,16 +1,15 @@
 Vagrant.configure("2") do |config|
-  # Seems to break Alpine images?
-  #config.vm.hostname = "alpine36"
-  config.vm.box = "generic/alpine36"
+  # Seems to break this Fedora image?
+  #config.vm.hostname = "fedora30"
+  config.vm.box = "fedora/30-cloud-base"
   config.vm.provider "virtualbox" do |vb|
-    vb.name = "alpine36"
+    vb.name = "fedora30"
   end
   config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
   config.vm.provision "shell", inline: <<-SHELL
     echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
-    apk update
-    apk upgrade
-    apk add zip unzip curl git build-base linux-headers ncurses-dev perl
+    dnf update -y
+    dnf install -y git zip unzip curl gcc make ncurses-devel perl-Test-Simple perl-IPC-Cmd perl-Test-Harness
     mv /tmp/gitlab-runner /usr/bin/gitlab-runner
     chown 0:0 /usr/bin/gitlab-runner
     chmod 755 /usr/bin/gitlab-runner

@@ -1,9 +1,10 @@
 $concurrent = 10
 
 $boxes = [
-  'alpine36',
   'alpine37',
   'alpine38',
+  'alpine39',
+  'alpine310',
   'arch',
   'centos6',
   'centos6i386',
@@ -13,6 +14,7 @@ $boxes = [
   'dragonflybsd5',
   'fedora28',
   'fedora29',
+  'fedora30',
   'freebsd11',
   'freebsd12',
   'freebsd12i386',
