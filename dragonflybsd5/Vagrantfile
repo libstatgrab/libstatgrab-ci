@@ -6,6 +6,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
   config.vm.provision "shell", inline: <<-SHELL
+    /sbin/hammer prune-everything /
     echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
     pkg upgrade -y
     pkg install -y curl zip git

@@ -1,17 +1,19 @@
 Vagrant.configure("2") do |config|
-  config.vm.hostname = "openbsd6"
-  config.vm.box = "generic/openbsd6"
+  # Seems to break this Fedora image?
+  #config.vm.hostname = "fedora31"
+  config.vm.box = "fedora/31-cloud-base"
   config.vm.provider "virtualbox" do |vb|
-    vb.name = "openbsd6"
+    vb.name = "fedora31"
+    vb.memory = 1024
   end
   config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
   config.vm.provision "shell", inline: <<-SHELL
     echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
-    pkg_add -u
-    pkg_add curl zip unzip-6.0p13 git
+    dnf update -y
+    dnf install -y git zip unzip curl gcc make ncurses-devel perl-Test-Simple perl-IPC-Cmd perl-Test-Harness
     mv /tmp/gitlab-runner /usr/bin/gitlab-runner
     chown 0:0 /usr/bin/gitlab-runner
     chmod 755 /usr/bin/gitlab-runner
-    /sbin/shutdown -p now
+    shutdown -h -P now
   SHELL
 end

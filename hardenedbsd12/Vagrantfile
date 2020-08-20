@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
     pkg upgrade -y
-    pkg install -y curl zip git
+    pkg install -y curl zip git-lite perl5
     mv /tmp/gitlab-runner /usr/bin/gitlab-runner
     chown 0:0 /usr/bin/gitlab-runner
     chmod 755 /usr/bin/gitlab-runner

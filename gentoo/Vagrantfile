@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "../gitlab-runner-shim.sh", destination: "/tmp/gitlab-runner"
   config.vm.provision "shell", inline: <<-SHELL
     echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
-    emerge app-arch/zip dev-vcs/git
+    emerge app-arch/zip dev-vcs/git sys-libs/ncurses
     mv /tmp/gitlab-runner /usr/bin/gitlab-runner
     chown 0:0 /usr/bin/gitlab-runner
     chmod 755 /usr/bin/gitlab-runner
