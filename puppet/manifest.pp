@@ -32,6 +32,7 @@ $boxes = [
   'ubuntu1604i386',
   'ubuntu1804',
   'ubuntu2004',
+  'ubuntu2204',
 ]
 
 package { [ 'virtualbox', 'virtualbox-ext-pack', 'vagrant', ]:
@@ -77,7 +78,7 @@ $boxes.each |String $box| {
     require   => Package['vagrant'],
   }
   exec { "register_runner_${box}":
-    command   => "/usr/bin/gitlab-runner register --non-interactive --registration-token='${::gitlab_runner_registration_token}' --name='libstatgrab-ci-${box}' --url='https://gitlab.com/' --executor=virtualbox --virtualbox-base-name='${box}' --virtualbox-disable-snapshots --ssh-user=vagrant --ssh-password=vagrant --tag-list='libstatgrab-ci-${box}'",
+    command   => "/usr/bin/gitlab-runner register --non-interactive --registration-token='${::gitlab_runner_registration_token}' --name='libstatgrab-ci-${box}' --url='https://gitlab.com/' --executor=virtualbox --virtualbox-base-name='${box}' --virtualbox-disable-snapshots --ssh-user=vagrant --ssh-password=vagrant --ssh-disable-strict-host-key-checking=true --tag-list='libstatgrab-ci-${box}'",
     unless    => "/bin/grep libstatgrab-ci-${box} /etc/gitlab-runner/config.toml",
     logoutput => true,
     require   => Package['gitlab-runner'],
